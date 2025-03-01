@@ -60,6 +60,16 @@ class ChartViewModel(QObject):
             data = Client.getInstance().getWeeklyChart(self.mv.currentStock['code'])
         elif self.currentTimeSelection == 'month':
             data = Client.getInstance().getMonthlyChart(self.mv.currentStock['code'])
+        elif self.currentTimeSelection == '1m':
+            data = Client.getInstance().getMinuteChart(self.mv.currentStock['code'], 1)
+        elif self.currentTimeSelection == '5m':
+            data = Client.getInstance().getMinuteChart(self.mv.currentStock['code'], 5)
+        elif self.currentTimeSelection == '15m':
+            data = Client.getInstance().getMinuteChart(self.mv.currentStock['code'], 15)
+        elif self.currentTimeSelection == '30m':
+            data = Client.getInstance().getMinuteChart(self.mv.currentStock['code'], 30)
+        elif self.currentTimeSelection == '1h':
+            data = Client.getInstance().getMinuteChart(self.mv.currentStock['code'], 60)
 
         self.__onChartDataReceived(data)
 
@@ -71,7 +81,7 @@ class ChartViewModel(QObject):
         if self.chart is None:
             self.chart = QtChart(self.widget, toolbox=True)
             self.chart.topbar.textbox('symbol')
-            self.chart.topbar.switcher('timeframe', ('day', 'week', 'month'), default='day',
+            self.chart.topbar.switcher('timeframe', ('day', 'week', 'month', '1m', '5m', '15m', '30m', '1h'), default='day',
                                        func=self.__onTimeframeSelection)
             self.chart.candle_style(up_color=ChartViewModel.upColor, down_color=ChartViewModel.downColor)
             self.chart.volume_config(up_color=ChartViewModel.upColor, down_color=ChartViewModel.downColor)

@@ -60,6 +60,11 @@ class Client(QObject):
         logger.debug(f"{stockCode}")
         return Client.__getChartByInterval(stockCode, '1mo')
 
+    @staticmethod
+    def getMinuteChart(stockCode: str, min_: int):
+        logger.debug(f"{stockCode}")
+        # min: 1, 2, 5, 15, 30, 60 , 90
+        return Client.__getMinuteChartByInterval(stockCode, interval=f'{min_}m')
 
     """
     private method
@@ -83,4 +88,29 @@ class Client(QObject):
             'Low': 'low',
             'Volume': 'volume'
         })
+        return df
+
+    @staticmethod
+    def __getMinuteChartByInterval(stockCode: str, interval):
+        logger.debug(f"{stockCode}:{interval}")
+
+        # 주가 데이터 가져오기
+        start_date = None
+        df = yf.download(f"{stockCode}.KS", start_date, interval=interval)
+        df.columns = df.columns.droplevel(1)  # Ticker 레벨 제거
+        df = df.reset_index()  # Date를 일반 컬럼으로 변환
+
+        # 컬럼명 변경
+        df = df.rename(columns={
+            'Datetime': 'time',
+            'Close': 'close',
+            'High': 'high',
+            'Open': 'open',
+            'Low': 'low',
+            'Volume': 'volume'
+        })
+
+        # 문자열을 datetime으로 변환 후 UTC 오프셋 제거
+        df['time'] = pd.to_datetime(df['time']).dt.tz_convert("Asia/Seoul").dt.strftime("%Y-%m-%d %H:%M:%S")
+
         return df
